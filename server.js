@@ -5,7 +5,7 @@ import pkg from 'mercadopago';
 const { MercadoPagoConfig, Preference } = pkg;
 
 const client = new MercadoPagoConfig({ 
-    accessToken: 'APP_USR-2926550097213535-092911-5eded40868803c83f12e9eef1afa99fa-1160956296',
+    accessToken: 'TEST-757882163780781-031118-ef31ff46742ce7e37b0cf839ae8bc8d7-244651428',
     integrator_id: 'dev_24c65fb163bf11ea96500242ac130004'
 })
 
@@ -23,28 +23,38 @@ app.post('/create_preference', async (req, res) => {
     try {
         const body = {
             items: [
-                {
+                {   
+                    id: req.body.id,
                     title: req.body.title,
                     quantity: Number(req.body.quantity),
                     unit_price: Number(req.body.price),
-                    currency_id: 'MXN'
+                    currency_id: 'MXN',
+                    description: req.body.description,
+                    picture_url: req.body.url,
                 }
             ],
             back_urls: {
-                success: 'https://checkoutpro-test.netlify.app/',
-                failure: 'https://checkoutpro-test.netlify.app/',
-                pending: 'https://checkoutpro-test.netlify.app/',
+                success: 'https://checkoutpro-test.netlify.app/success/',
+                failure: 'https://checkoutpro-test.netlify.app/failure/',
+                pending: 'https://checkoutpro-test.netlify.app/pending/',
             },
             auto_return: 'approved',
-            excluded_payment_methods: [
-                {
-                    id: "visa"
-                },
-                {
-                    id: "debvisa"
-                }
-            ],
-            "installments": 6
+            payment_methods: {
+                excluded_payment_methods: [
+                    {
+                            id: "visa"
+                    }
+                ],
+                installments:6,
+            },
+            payer: {
+                phone: { area_code: '+52', number: '5554178003' },
+                address: { zip_code: '16050', street_name: 'calle falsa', street_number: '123' },
+                email: 'test_user_94708656@testuser.com',
+                name: 'Lalo',
+                surname: 'Landa',
+            },
+            external_reference: 'arturo.araujo.alvarez@gmail.com',
         }
 
         const preference = new Preference(client)
@@ -69,9 +79,27 @@ preference.create({ body: {
 			id: '<ID>',
 			title: '<title>',
 			quantity: 1,
-			unit_price: 10000
+			unit_price: 100,
+            description: '<description>',
+            picture_url: 'url',
 		}
 	],
+    payment_methods: {
+        excluded_payment_methods: [
+            {
+                    id: "visa"
+            }
+        ],
+        installments:6,
+    },
+    payer: {
+        phone: { area_code: '+52', number: '5554178003' },
+        address: { zip_code: '16050', street_name: 'calle falsa', street_number: '123' },
+        email: 'test_user_94708656@testuser.com',
+        name: 'Lalo',
+        surname: 'Landa',
+    },
+    external_reference: 'arturo.araujo.alvarez@gmail.com',
 } }).then(console.log).catch(console.log);
 
 app.listen(port, () => {
