@@ -50,7 +50,7 @@ app.post('/create_preference', async (req, res) => {
             payer: {
                 phone: { area_code: '+52', number: '5554178003' },
                 address: { zip_code: '16050', street_name: 'calle falsa', street_number: '123' },
-                email: 'test_user_94708656@testuser.com',
+                email: 'arturo.araujo_25@hotmail.com',
                 name: 'Lalo',
                 surname: 'Landa',
             },
