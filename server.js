@@ -47,13 +47,6 @@ app.post('/create_preference', async (req, res) => {
                 ],
                 installments:6,
             },
-            payer: {
-                phone: { area_code: '+52', number: '5554178003' },
-                address: { zip_code: '16050', street_name: 'calle falsa', street_number: '123' },
-                email: 'arturo.araujo_25@hotmail.com',
-                name: 'Lalo',
-                surname: 'Landa',
-            },
             external_reference: 'arturo.araujo.alvarez@gmail.com',
         }
 
