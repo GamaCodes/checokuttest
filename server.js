@@ -5,7 +5,7 @@ import pkg from 'mercadopago';
 const { MercadoPagoConfig, Preference } = pkg;
 
 const client = new MercadoPagoConfig({ 
-    accessToken: 'TEST-757882163780781-031118-ef31ff46742ce7e37b0cf839ae8bc8d7-244651428',
+    accessToken: 'APP_USR-2926550097213535-092911-5eded40868803c83f12e9eef1afa99fa-1160956296',
     integrator_id: 'dev_24c65fb163bf11ea96500242ac130004'
 })
 
@@ -91,6 +91,12 @@ preference.create({ body: {
             }
         ],
         installments:6,
+    },
+    auto_return: 'approved',
+    back_urls: {
+        success: 'https://checkoutpro-test.netlify.app/success/',
+        failure: 'https://checkoutpro-test.netlify.app/failure/',
+        pending: 'https://checkoutpro-test.netlify.app/pending/',
     },
     payer: {
         phone: { area_code: '+52', number: '5554178003' },
