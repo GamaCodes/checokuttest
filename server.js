@@ -2,12 +2,11 @@ import express from 'express'
 import cors from 'cors'
 import pkg from 'mercadopago';
 
-const { MercadoPagoConfig, Preference } = pkg;
+const { MercadoPagoConfig, Payment, Preference } = pkg;
 
-const client = new MercadoPagoConfig({ 
-    accessToken: 'APP_USR-1501644402575543-010823-f50d2946e05248f0ae8d1057cf8e9b36-244651428',
-    integrator_id: 'dev_24c65fb163bf11ea96500242ac130004'
-})
+const client = new MercadoPagoConfig({
+  accessToken: 'TEST-6826341725505987-020621-42c47cac11ca0cd3a7a8c4a7c4127687-1552446320',
+});
 
 const app = express()
 const port = 3000
@@ -16,91 +15,71 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/', (req, res) => {
-    res.send('Server funcionando correctamente')
-})
-
-app.post('/create_preference', async (req, res) => {
-    try {
-        const body = {
-            items: [
-                {   
-                    id: req.body.id,
-                    title: req.body.title,
-                    quantity: Number(req.body.quantity),
-                    unit_price: Number(req.body.price),
-                    currency_id: 'MXN',
-                    description: req.body.description,
-                    picture_url: req.body.url,
-                }
-            ],
-            back_urls: {
-                success: 'https://checkoutpro-test.netlify.app/success/',
-                failure: 'https://checkoutpro-test.netlify.app/failure/',
-                pending: 'https://checkoutpro-test.netlify.app/pending/',
-            },
-            auto_return: 'approved',
-            payment_methods: {
-                excluded_payment_methods: [
-                    {
-                            id: "visa"
-                    }
-                ],
-                installments:6,
-            },
-            external_reference: 'arturo.araujo.alvarez@gmail.com',
-        }
-
-        const preference = new Preference(client)
-        const result = await preference.create({ body })
-
-        res.json({
-            id: result.id
-        })
-    } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            error: 'Error al crear preferencia'
-        })
-    }
+  res.send('Server funcionando correctamente')
 })
 
 const preference = new Preference(client);
 
-preference.create({ body: {
-	items: [
-		{
-			id: '<ID>',
-			title: '<title>',
-			quantity: 1,
-			unit_price: 100,
-            description: '<description>',
-            picture_url: 'url',
-		}
-	],
-    payment_methods: {
-        excluded_payment_methods: [
-            {
-                    id: "visa"
-            }
-        ],
-        installments:6,
-    },
-    auto_return: 'approved',
-    back_urls: {
-        success: 'https://checkoutpro-test.netlify.app/success/',
-        failure: 'https://checkoutpro-test.netlify.app/failure/',
-        pending: 'https://checkoutpro-test.netlify.app/pending/',
-    },
-    payer: {
-        phone: { area_code: '+52', number: '5554178003' },
-        address: { zip_code: '16050', street_name: 'calle falsa', street_number: '123' },
-        email: 'test_user_94708656@testuser.com',
-        name: 'Lalo',
-        surname: 'Landa',
-    },
-    external_reference: 'arturo.araujo.alvarez@gmail.com',
-} }).then(console.log).catch(console.log);
+app.post('/get_preference', (req, res) => {
+  const { body } = req;
+  
+  preference.create({body})
+  .then(
+      function (response) {
+        res.status(201).json({
+          id: response.id
+        });
+      }
+    )
+    .catch(
+      function (error) {
+        console.log(error);
+        const { errorMessage, errorStatus } = validateError(error);
+        res.status(errorStatus).json({ error_message: errorMessage });
+      }
+    );
+})
+
+const payment = new Payment(client);
+
+app.post("/process_payment", (req, res) => {
+  const { body } = req;
+
+  payment.create({ body })
+    .then(
+      function (response) {
+        res.status(201).json({
+          detail: response,
+          status: response.status,
+          id: response.id,
+          authorization_code: response.authorization_code
+        });
+      }
+    )
+    .catch(
+      function (error) {
+        console.log(error);
+        const { errorMessage, errorStatus } = validateError(error);
+        res.status(errorStatus).json({ error_message: errorMessage });
+      }
+    );
+});
+
+function validateError(error) {
+  let errorMessage = 'Unknown error cause';
+  let errorStatus = 400;
+
+  if (error.cause) {
+    const sdkErrorMessage = error.cause[0];
+    errorMessage = sdkErrorMessage || errorMessage;
+
+    const sdkErrorStatus = error.status;
+    errorStatus = sdkErrorStatus || errorStatus;
+  }
+
+  return { errorMessage, errorStatus };
+}
 
 app.listen(port, () => {
-    console.log(`El servidor esta corriendo en el puerto ${port}`)
+  console.log(`El servidor esta corriendo en el puerto ${port}`)
 })
