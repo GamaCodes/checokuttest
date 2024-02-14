@@ -5,7 +5,7 @@ import pkg from 'mercadopago';
 const { MercadoPagoConfig, Payment, Preference } = pkg;
 
 const client = new MercadoPagoConfig({
-  accessToken: 'TEST-6826341725505987-020621-42c47cac11ca0cd3a7a8c4a7c4127687-1552446320',
+  accessToken: 'APP_USR-7864635266086541-021323-a9f1850992664647015525c939353fad-1670626191',
 });
 
 const app = express()
