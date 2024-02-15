@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import pkg from 'mercadopago';
 
-const { MercadoPagoConfig, Payment, Preference } = pkg;
+const { MercadoPagoConfig, Payment, Preference, MerchantOrder } = pkg;
 
 const client = new MercadoPagoConfig({
   accessToken: 'APP_USR-7864635266086541-021323-a9f1850992664647015525c939353fad-1670626191',
@@ -16,6 +16,27 @@ app.use(express.json())
 
 app.get('/', (req, res) => {
   res.send('Server funcionando correctamente')
+})
+
+const merchantOrder = new MerchantOrder(client);
+
+app.post('/get_order_detail', (req, res) => {
+  const { body } = req;
+  merchantOrder.get({ merchantOrderId: body.order })
+  .then(
+    function (response) {
+      console.log(response, 'response')
+      res.status(201).json({
+        order: response
+      });
+    }
+  )
+  .catch(
+    function (error) {
+      console.log(error);
+      res.status(400).json({ error });
+    }
+  );
 })
 
 const preference = new Preference(client);
